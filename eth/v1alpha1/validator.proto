@@ -279,7 +279,10 @@ message ValidatorIndexResponse {
 
 message ValidatorStatusRequest {
     // A 48 byte validator public key.
-    bytes public_key = 1 [(gogoproto.moretags) = "ssz-size:\"48\""];
+    bytes public_key = 1 [(gogoproto.moretags) = "ssz-size:\"48\"", deprecated = true];
+
+    // A list of 48 byte validator public keys.
+    repeated bytes public_keys = 2 [(gogoproto.moretags) = "ssz-size:\"?,48\""];
 }
 
 enum ValidatorStatus {
@@ -290,6 +293,26 @@ enum ValidatorStatus {
   EXITING = 4;
   SLASHING = 5;
   EXITED = 6;
+}
+
+message ValidatorStatusMetadata {
+    // The corresponding validator status.
+    ValidatorStatus status = 1;
+
+    // The block number of the Ethereum proof-of-work chain
+    // where the deposit for the validator was included.
+   uint64 eth1_deposit_block_numbers = 2;
+
+    // The slot in the beacon chain in which the validator's
+    // deposit was included in a block.
+   uint64 deposit_inclusion_slots = 3;
+
+    // The epoch in the beacon chain in which the validator
+    // is determined as active.
+   uint64 activation_epochs = 4;
+
+    // The position in the activation queue of pending validators.
+   uint64 position_in_activation_queues = 5;
 }
 
 message ValidatorStatusResponse {
@@ -310,6 +333,10 @@ message ValidatorStatusResponse {
 
     // The position in the activation queue of pending validators.
     uint64 position_in_activation_queue = 5;
+
+    // A list of validator status metadata mapped 1-to-1
+    // with the public keys in the request.
+    repeated ValidatorStatusMetadata statuses = 6;
 }
 
 message DutiesRequest {
